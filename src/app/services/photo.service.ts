@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
+import { Storage } from '@ionic/storage';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
 
 export class PhotoService {
   public photos: Photo[] = [];
-  constructor(private camera: Camera) { };
+  constructor(private camera: Camera, private storage: Storage) { };
 
   takePicture() {
 
@@ -32,7 +33,7 @@ export class PhotoService {
      // Handle error
      console.log("Camera issue:" + err);
     });
-    */
+    *
     this.camera.getPicture(options).then((imageData) => {
         // Add new photo to gallery
         appRoot.setAttribute("style","opacity:1;");
@@ -42,8 +43,33 @@ export class PhotoService {
         // Handle error
         appRoot.setAttribute("style","opacity:1;");
         console.log("Camera issue: " + err);
-    });   
+    });  
+    
+    */
+
+    this.camera.getPicture(options).then((imageData) => {
+      // Add new photo to gallery
+      appRoot.setAttribute("style","opacity:1;");
+      this.photos.unshift({
+        data: 'data:image/jpeg;base64,' + imageData
+      });
+    
+      // Save all photos for later viewing
+      this.storage.set('photos', this.photos);
+    }, (err) => {
+      // Handle error
+      appRoot.setAttribute("style","opacity:1;");
+      console.log("Camera issue: " + err);
+    });    
+
   }  
+
+  loadSaved() {
+    this.storage.get('photos').then((photos) => {
+      this.photos = photos || [];
+    });
+  }
+
 }
 
 
